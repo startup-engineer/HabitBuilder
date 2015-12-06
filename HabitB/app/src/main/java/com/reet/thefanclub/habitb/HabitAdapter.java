@@ -42,10 +42,10 @@ class HabitItem {
 
 public class HabitAdapter extends ArrayAdapter<HabitItem> {
 
-    private List<String> nameList;
+    private List<HabitItem> nameList;
     private Context context;
 
-    public HabitAdapter(List<String> nameList, Context context) {
+    public HabitAdapter(List<HabitItem> nameList, Context context) {
         super(context, R.layout.list_item_forecast);
         this.nameList = nameList;
         this.context = context;
@@ -78,7 +78,7 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
             holder = (HabitHolder) v.getTag();
         }
 
-        HabitItem h = new HabitItem(nameList.get(position));
+        HabitItem h = new HabitItem(nameList.get(position).getName());
         holder.name.setText(h.getName());
         holder.completed[0].setChecked(h.isChecked(0));
         holder.completed[1].setChecked(h.isChecked(1));

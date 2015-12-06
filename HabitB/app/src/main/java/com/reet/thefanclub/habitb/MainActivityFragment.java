@@ -23,37 +23,14 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        /*
         String[] forecastArray = {
                 "first thing",
                 "Second thing",
                 "third thing",
-                "fourth thing",
-                "fifth thing",
-                "sixth thing",
-                "seventh thing",
-                "first thing",
-                "Second thing",
-                "third thing",
-                "fourth thing",
-                "fifth thing",
-                "sixth thing",
-                "seventh thing",
-                "first thing",
-                "Second thing",
-                "third thing",
-                "fourth thing",
-                "fifth thing",
-                "sixth thing",
-                "seventh thing",
-                "first thing",
-                "Second thing",
-                "third thing",
-                "fourth thing",
-                "fifth thing",
-                "sixth thing",
-                "seventh thing"
+                "fourth thing"
         };
 
         List<String> weekForecast = new ArrayList<String>(
@@ -70,7 +47,8 @@ public class MainActivityFragment extends Fragment {
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
-
+        */
         return rootView;
     }
+
 }
