@@ -16,36 +16,43 @@
 
         <CheckBox
             android:layout_width="32dp"
-            android:layout_height="32dp" />
+            android:layout_height="32dp"
+            android:id="@+id/box0"/>
 
         <CheckBox
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:id="@+id/box1"
             />
 
         <CheckBox
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:id="@+id/box2"
             />
 
         <CheckBox
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:id="@+id/box3"
             />
 
         <CheckBox
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:id="@+id/box4"
             />
 
         <CheckBox
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:id="@+id/box5"
             />
 
         <CheckBox
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:id="@+id/box6"
             />
     </LinearLayout>
 </RelativeLayout>
