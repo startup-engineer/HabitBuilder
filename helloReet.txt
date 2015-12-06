@@ -1,3 +1,7 @@
-You fine as hell, Reet
+git add --all
 
-You fine as hell cam
+git status
+
+git commit -m "my message"
+
+git push -u Reet
