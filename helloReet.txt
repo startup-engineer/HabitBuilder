@@ -4,4 +4,4 @@ git status
 
 git commit -m "my message"
 
-git push -u Reet
+git push -u origin Reet
