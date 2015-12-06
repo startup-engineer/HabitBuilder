@@ -26,7 +26,7 @@ public class MainActivityFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         String[] forecastArray = {
-                "first thing",
+                "make thing",
                 "Second thing",
                 "third thing",
                 "fourth thing",
