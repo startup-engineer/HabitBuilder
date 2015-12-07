@@ -25,6 +25,21 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        ListView lv;
+        ArrayList<HabitItem> habitList;
+        HabitAdapter hAdapter;
+
+        lv = (ListView) rootView.findViewById(R.id.listview_forecast);
+
+        habitList = new ArrayList<HabitItem>();
+        habitList.add(new HabitItem("Guitar"));
+        habitList.add(new HabitItem("Read"));
+        habitList.add(new HabitItem("Exercise"));
+        habitList.add(new HabitItem("Homework"));
+
+        hAdapter = new HabitAdapter(habitList, getActivity());
+        lv.setAdapter(hAdapter);
         /*
         String[] forecastArray = {
                 "first thing",

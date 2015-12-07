@@ -46,7 +46,7 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
     private Context context;
 
     public HabitAdapter(List<HabitItem> nameList, Context context) {
-        super(context, R.layout.list_item_forecast);
+        super(context, R.layout.list_item_forecast, nameList);
         this.nameList = nameList;
         this.context = context;
     }
@@ -58,6 +58,7 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
+
         View v = convertView;
 
         HabitHolder holder = new HabitHolder();
@@ -78,8 +79,8 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
             holder = (HabitHolder) v.getTag();
         }
 
-        HabitItem h = new HabitItem(nameList.get(position).getName());
-        holder.name.setText(h.getName());
+        HabitItem h = nameList.get(position);
+        holder.name.setText("yolo");
         holder.completed[0].setChecked(h.isChecked(0));
         holder.completed[1].setChecked(h.isChecked(1));
         holder.completed[2].setChecked(h.isChecked(2));
