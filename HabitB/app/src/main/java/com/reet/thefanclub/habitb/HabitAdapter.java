@@ -1,5 +1,6 @@
 package com.reet.thefanclub.habitb;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,51 +52,28 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
         this.context = context;
     }
 
-    private static class HabitHolder {
-        public TextView name;
-        public CheckBox completed[] = new CheckBox[7];
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
+        LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+        convertView = inflater.inflate(R.layout.list_item_forecast, parent, false);
+        TextView name = (TextView) convertView.findViewById(R.id.list_item_forecast_textview);
+        CheckBox cb0 = (CheckBox) convertView.findViewById(R.id.box0);
+        CheckBox cb1 = (CheckBox) convertView.findViewById(R.id.box1);
+        CheckBox cb2 = (CheckBox) convertView.findViewById(R.id.box2);
+        CheckBox cb3 = (CheckBox) convertView.findViewById(R.id.box3);
+        CheckBox cb4 = (CheckBox) convertView.findViewById(R.id.box4);
+        CheckBox cb5 = (CheckBox) convertView.findViewById(R.id.box5);
+        CheckBox cb6 = (CheckBox) convertView.findViewById(R.id.box6);
 
-        View v = convertView;
+        name.setText(nameList.get(position).getName());
+        cb0.setChecked(((CheckBox) convertView.findViewById(R.id.box0)).isChecked());
+        cb1.setChecked(((CheckBox) convertView.findViewById(R.id.box1)).isChecked());
+        cb2.setChecked(((CheckBox) convertView.findViewById(R.id.box2)).isChecked());
+        cb3.setChecked(((CheckBox) convertView.findViewById(R.id.box3)).isChecked());
+        cb4.setChecked(((CheckBox) convertView.findViewById(R.id.box4)).isChecked());
+        cb5.setChecked(((CheckBox) convertView.findViewById(R.id.box5)).isChecked());
+        cb6.setChecked(((CheckBox) convertView.findViewById(R.id.box6)).isChecked());
 
-        HabitHolder holder = new HabitHolder();
-
-        if(convertView == null){
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(R.layout.list_item_forecast, null);
-
-            holder.name = (TextView) v.findViewById(R.id.list_item_forecast_textview);
-            holder.completed[0] = (CheckBox) v.findViewById(R.id.box0);
-            holder.completed[1] = (CheckBox) v.findViewById(R.id.box1);
-            holder.completed[2] = (CheckBox) v.findViewById(R.id.box2);
-            holder.completed[3] = (CheckBox) v.findViewById(R.id.box3);
-            holder.completed[4] = (CheckBox) v.findViewById(R.id.box4);
-            holder.completed[5] = (CheckBox) v.findViewById(R.id.box5);
-            holder.completed[6] = (CheckBox) v.findViewById(R.id.box6);
-        } else {
-            holder = (HabitHolder) v.getTag();
-        }
-
-        HabitItem h = nameList.get(position);
-        holder.name.setText("yolo");
-        holder.completed[0].setChecked(h.isChecked(0));
-        holder.completed[1].setChecked(h.isChecked(1));
-        holder.completed[2].setChecked(h.isChecked(2));
-        holder.completed[3].setChecked(h.isChecked(3));
-        holder.completed[4].setChecked(h.isChecked(4));
-        holder.completed[5].setChecked(h.isChecked(5));
-        holder.completed[6].setChecked(h.isChecked(6));
-        holder.completed[0].setTag(h);
-        holder.completed[1].setTag(h);
-        holder.completed[2].setTag(h);
-        holder.completed[3].setTag(h);
-        holder.completed[4].setTag(h);
-        holder.completed[5].setTag(h);
-        holder.completed[6].setTag(h);
-
-        return v;
+        return convertView;
     }
 }
