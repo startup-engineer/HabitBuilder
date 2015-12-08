@@ -8,9 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,12 +22,17 @@ import java.util.List;
 class HabitItem {
     String name;
     boolean completed[] = new boolean[7];
+    List<HabitItem> children = new ArrayList<HabitItem>();
+
 
     public String getName(){
         return name;
     }
     public boolean[] getCompleted(){
         return completed;
+    }
+    public void setCompleted(int index, boolean checked){
+        completed[index] = checked;
     }
 
     public boolean isChecked(int index){
@@ -53,7 +60,7 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent){
+    public View getView(final int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = ((Activity) context).getLayoutInflater();
         convertView = inflater.inflate(R.layout.list_item_forecast, parent, false);
         TextView name = (TextView) convertView.findViewById(R.id.list_item_forecast_textview);
@@ -65,15 +72,41 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
         CheckBox cb5 = (CheckBox) convertView.findViewById(R.id.box5);
         CheckBox cb6 = (CheckBox) convertView.findViewById(R.id.box6);
 
-        name.setText(nameList.get(position).getName());
-        cb0.setChecked(((CheckBox) convertView.findViewById(R.id.box0)).isChecked());
-        cb1.setChecked(((CheckBox) convertView.findViewById(R.id.box1)).isChecked());
-        cb2.setChecked(((CheckBox) convertView.findViewById(R.id.box2)).isChecked());
-        cb3.setChecked(((CheckBox) convertView.findViewById(R.id.box3)).isChecked());
-        cb4.setChecked(((CheckBox) convertView.findViewById(R.id.box4)).isChecked());
-        cb5.setChecked(((CheckBox) convertView.findViewById(R.id.box5)).isChecked());
-        cb6.setChecked(((CheckBox) convertView.findViewById(R.id.box6)).isChecked());
+        CheckBox checkBoxes[] = {cb0, cb1, cb2, cb3, cb4, cb5, cb6};
 
+        name.setText(nameList.get(position).getName());
+        cb0.setChecked(nameList.get(position).isChecked(0));
+        cb1.setChecked(nameList.get(position).isChecked(1));
+        cb2.setChecked(nameList.get(position).isChecked(2));
+        cb3.setChecked(nameList.get(position).isChecked(3));
+        cb4.setChecked(nameList.get(position).isChecked(4));
+        cb5.setChecked(nameList.get(position).isChecked(5));
+        cb6.setChecked(nameList.get(position).isChecked(6));
+
+        final int boxId[] = {R.id.box0, R.id.box1, R.id.box2, R.id.box3,
+                R.id.box4, R.id.box5, R.id.box6};
+
+        for(int i = 0; i < 7; i++){
+            final int finalI = i;
+            checkBoxes[i].setOnClickListener(new View.OnClickListener() {
+
+                public void onClick(View v) {
+
+                    CheckBox cb = (CheckBox) v.findViewById(boxId[finalI]);
+
+                    if (cb.isChecked()) {
+                        nameList.get(position).setCompleted(finalI, true);
+                        Toast toast = Toast.makeText(context, "You clicked " +
+                                nameList.get(position).getName(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else if (!cb.isChecked()) {
+                        nameList.get(position).setCompleted(finalI, false);
+                        // do some operations here
+                    }
+                }
+            });
+            checkBoxes[i].setChecked(nameList.get(position).isChecked(i));
+        }
         return convertView;
     }
 }

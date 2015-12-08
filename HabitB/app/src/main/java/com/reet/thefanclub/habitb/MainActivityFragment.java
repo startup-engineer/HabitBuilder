@@ -1,10 +1,12 @@
 package com.reet.thefanclub.habitb;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -56,6 +58,16 @@ public class MainActivityFragment extends Fragment {
         habitList.add(new HabitItem("Exercise"));
         habitList.add(new HabitItem("Homework"));
 
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+              @Override
+              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                  Intent intent = new Intent(getActivity(), childActivity.class)
+                          .putExtra("Sup Dawg", "Hello");
+                  startActivity(intent);
+              }
+          }
+
+        );
 
         hAdapter = new HabitAdapter(habitList, getActivity());
         lv.setAdapter(hAdapter);
