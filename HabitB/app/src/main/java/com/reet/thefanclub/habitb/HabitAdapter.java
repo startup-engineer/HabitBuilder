@@ -26,20 +26,6 @@ class HabitItem implements Parcelable{
     boolean completed[] = new boolean[7];
     List<HabitItem> children = new ArrayList<HabitItem>();
 
-    /*
-    public HabitItem(Parcel in) {
-        this.name = in.readString();
-
-        boolean array[] = new boolean[7];
-        in.readBooleanArray(array);
-
-        for(int i = 0; i < 7; i++){
-            this.completed[i] = array[i];
-        }
-
-        in.readList(children, List.class.getClassLoader());
-    */
-
     public HabitItem(String name) {
         this.name = name;
         for(int i = 0; i < 7; i++){
@@ -62,6 +48,11 @@ class HabitItem implements Parcelable{
     public void addChildren(List<HabitItem> children){
         for(int i = 0; i < children.size(); i++)
             addChild(children.get(i));
+    }
+    public void setChildren(List<HabitItem> newChildren){
+        children.clear();
+        for(int i = 0; i < newChildren.size(); i++)
+            children.add(newChildren.get(i));
     }
     public HabitItem getChild(int index){
         return children.get(index);
@@ -157,7 +148,7 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
                         toast.show();
                     } else if (!cb.isChecked()) {
                         nameList.get(position).setCompleted(finalI, false);
-                        // do some operations here
+
                     }
                 }
             });

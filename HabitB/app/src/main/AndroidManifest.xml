@@ -27,6 +27,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.reet.thefanclub.habitb.MainActivity" />
         </activity>
+        <activity
+            android:name=".UserInput"
+            android:label="@string/title_activity_user_input"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
     </application>
 
 </manifest>
