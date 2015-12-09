@@ -2,6 +2,8 @@ package com.reet.thefanclub.habitb;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +21,31 @@ import java.util.List;
  * Created by Reet Chowdhary on 12/5/2015.
  */
 
-class HabitItem {
+class HabitItem implements Parcelable{
     String name;
     boolean completed[] = new boolean[7];
     List<HabitItem> children = new ArrayList<HabitItem>();
 
+    /*
+    public HabitItem(Parcel in) {
+        this.name = in.readString();
+
+        boolean array[] = new boolean[7];
+        in.readBooleanArray(array);
+
+        for(int i = 0; i < 7; i++){
+            this.completed[i] = array[i];
+        }
+
+        in.readList(children, List.class.getClassLoader());
+    */
+
+    public HabitItem(String name) {
+        this.name = name;
+        for(int i = 0; i < 7; i++){
+            completed[i] = false;
+        }
+    }
 
     public String getName(){
         return name;
@@ -34,18 +56,52 @@ class HabitItem {
     public void setCompleted(int index, boolean checked){
         completed[index] = checked;
     }
-
+    public void addChild(HabitItem child){
+        children.add(child);
+    }
+    public void addChildren(List<HabitItem> children){
+        for(int i = 0; i < children.size(); i++)
+            addChild(children.get(i));
+    }
+    public HabitItem getChild(int index){
+        return children.get(index);
+    }
+    public List<HabitItem> getChildren(){
+        return children;
+    }
     public boolean isChecked(int index){
         return completed[index];
     }
 
-    public HabitItem(String name) {
-        super();
-        this.name = name;
-        for(int i = 0; i < 7; i++){
-            completed[i] = false;
-        }
+    @Override
+    public int describeContents() {
+        return 0;
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeBooleanArray(completed);
+        dest.writeTypedList(children);
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public HabitItem createFromParcel(Parcel in) {
+            HabitItem item = new HabitItem(in.readString());
+            boolean array[] = new boolean[7];
+            in.readBooleanArray(array);
+            for(int i = 0; i < 7; i++)
+                item.setCompleted(i, array[i]);
+            List<HabitItem> list = new ArrayList<HabitItem>();
+            in.readTypedList(list, HabitItem.CREATOR);
+            item.addChildren(list);
+            return item;
+        }
+
+        public HabitItem[] newArray(int size) {
+            return new HabitItem[size];
+        }
+    };
 }
 
 public class HabitAdapter extends ArrayAdapter<HabitItem> {

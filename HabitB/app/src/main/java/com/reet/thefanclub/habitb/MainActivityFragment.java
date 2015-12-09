@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +29,8 @@ public class MainActivityFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ListView lv;
-        ArrayList<HabitItem> habitList;
+        final ListView lv;
+        final ArrayList<HabitItem> habitList;
         HabitAdapter hAdapter;
 
         lv = (ListView) rootView.findViewById(R.id.listview_forecast);
@@ -39,30 +40,24 @@ public class MainActivityFragment extends Fragment {
         habitList.add(new HabitItem("Read"));
         habitList.add(new HabitItem("Exercise"));
         habitList.add(new HabitItem("Homework"));
-        habitList.add(new HabitItem("Guitar"));
-        habitList.add(new HabitItem("Read"));
-        habitList.add(new HabitItem("Exercise"));
-        habitList.add(new HabitItem("Homework"));
-        habitList.add(new HabitItem("Guitar"));
-        habitList.add(new HabitItem("Read"));
-        habitList.add(new HabitItem("Exercise"));
-        habitList.add(new HabitItem("Homework"));
-        habitList.add(new HabitItem("Guitar"));
-        habitList.add(new HabitItem("Read"));
-        habitList.add(new HabitItem("Exercise"));
-        habitList.add(new HabitItem("Homework"));
-        habitList.add(new HabitItem("Guitar"));
-        habitList.add(new HabitItem("Read"));
-        habitList.add(new HabitItem("Exercise"));
-        habitList.add(new HabitItem("Read"));
-        habitList.add(new HabitItem("Exercise"));
-        habitList.add(new HabitItem("Homework"));
+
+        habitList.get(0).addChild(new HabitItem("Scales"));
+        habitList.get(0).addChild(new HabitItem("Chords"));
+        habitList.get(0).addChild(new HabitItem("Stretch"));
+
+        habitList.get(0).getChildren().get(0).addChild(new HabitItem("1A"));
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
               @Override
               public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                  Intent intent = new Intent(getActivity(), childActivity.class)
-                          .putExtra("Sup Dawg", "Hello");
+
+                  HabitItem item = (HabitItem) habitList.get(position);
+                  if(item.getChildren().size() == 0){
+                      Toast toast = Toast.makeText(getContext(), "First item in " + item.getName() + " is null", Toast.LENGTH_SHORT);
+                      toast.show();
+                  }
+                  Intent intent = new Intent(getActivity(), subActivity.class)
+                          .putExtra("selectedItem", item);
                   startActivity(intent);
               }
           }

@@ -19,8 +19,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".childActivity"
-            android:label="@string/title_activity_child"
+            android:name=".subActivity"
+            android:label="@string/title_activity_sub"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
