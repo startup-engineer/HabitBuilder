@@ -1,10 +1,12 @@
 package com.reet.thefanclub.habitb;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -29,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final ListView lv;
-        HabitAdapter hAdapter;
+        final HabitAdapter hAdapter;
 
         lv = (ListView) findViewById(R.id.listview_forecast);
 
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         habitList.get(0).getChildren().get(0).addChild(new HabitItem("4"));
 
         final Activity activity = this;
+        hAdapter = new HabitAdapter(habitList, this);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
               @Override
@@ -63,11 +66,29 @@ public class MainActivity extends AppCompatActivity {
                   intent.putExtra("selectedPosition", position);
                   startActivityForResult(intent, 2);
               }
-          }
+        });
+        lv.setLongClickable(true);
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           int position, long id) {
+                AlertDialog.Builder adb=new AlertDialog.Builder(activity);
+                adb.setTitle("Delete?");
+                adb.setMessage("Are you sure you want to delete " + habitList.get(position).getName());
+                final int positionToRemove = position;
+                adb.setNegativeButton("Cancel", null);
+                adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        habitList.remove(positionToRemove);
+                        hAdapter.notifyDataSetChanged();
+                    }});
+                adb.show();
+                return true;
+            }
 
-        );
 
-        hAdapter = new HabitAdapter(habitList, this);
+        });
+
         lv.setAdapter(hAdapter);
 
         final ActionButton actionButton = (ActionButton) findViewById(R.id.action_button);

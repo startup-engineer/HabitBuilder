@@ -1,10 +1,12 @@
 package com.reet.thefanclub.habitb;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -40,6 +42,7 @@ public class subActivity extends AppCompatActivity {
         for(int j = 0; j < habitListTemp.size(); j++)
             habitList.add(habitListTemp.get(j));
         final Activity activity = this;
+        final HabitAdapter hAdapter = new HabitAdapter(habitList, this);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
               @Override
@@ -51,14 +54,28 @@ public class subActivity extends AppCompatActivity {
                   intent.putExtra("selectedPosition", position);
                   startActivityForResult(intent, 2);
               }
-        }
+        });
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           int position, long id) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                adb.setTitle("Delete?");
+                adb.setMessage("Are you sure you want to delete " + habitList.get(position).getName());
+                final int positionToRemove = position;
+                adb.setNegativeButton("Cancel", null);
+                adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        habitList.remove(positionToRemove);
+                        hAdapter.notifyDataSetChanged();
+                    }
+                });
+                adb.show();
+                return true;
+            }
 
-        );
 
-        HabitAdapter hAdapter = new HabitAdapter(habitList, this);
-        lv.setAdapter(hAdapter);
-
-        hAdapter = new HabitAdapter(habitList, this);
+        });
         lv.setAdapter(hAdapter);
 
         final ActionButton actionButton = (ActionButton) findViewById(R.id.sub_action_button);
