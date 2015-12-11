@@ -12,7 +12,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+import com.nhaarman.listviewanimations.util.Swappable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,21 +95,33 @@ class HabitItem implements Parcelable{
     };
 }
 
-public class HabitAdapter extends ArrayAdapter<HabitItem> {
+public class HabitAdapter extends ArrayAdapter<HabitItem> implements Swappable{
 
     private List<HabitItem> nameList;
     private Context context;
 
     public HabitAdapter(List<HabitItem> nameList, Context context) {
-        super(context, R.layout.list_item_forecast, nameList);
+        super(context, R.layout.habit_item, nameList);
         this.nameList = nameList;
         this.context = context;
     }
 
     @Override
+    public long getItemId(final int position) {
+        return getItem(position).hashCode();
+    }
+
+    @Override
+    public boolean hasStableIds(){
+        return true;
+    }
+
+    @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-        convertView = inflater.inflate(R.layout.list_item_forecast, parent, false);
+        if(convertView == null) {
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+            convertView = inflater.inflate(R.layout.habit_item, parent, false);
+        }
         TextView name = (TextView) convertView.findViewById(R.id.list_item_forecast_textview);
         CheckBox cb0 = (CheckBox) convertView.findViewById(R.id.box0);
         CheckBox cb1 = (CheckBox) convertView.findViewById(R.id.box1);
@@ -133,7 +145,7 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
         final int boxId[] = {R.id.box0, R.id.box1, R.id.box2, R.id.box3,
                 R.id.box4, R.id.box5, R.id.box6};
 
-        for(int i = 0; i < 7; i++){
+        for (int i = 0; i < 7; i++) {
             final int finalI = i;
             checkBoxes[i].setOnClickListener(new View.OnClickListener() {
 
@@ -154,6 +166,14 @@ public class HabitAdapter extends ArrayAdapter<HabitItem> {
             });
             checkBoxes[i].setChecked(nameList.get(position).isChecked(i));
         }
+
         return convertView;
+    }
+
+    @Override
+    public void swapItems(int positionOne, int positionTwo) {
+        HabitItem temp = nameList.get(positionOne);
+        nameList.set(positionOne, nameList.get(positionTwo));
+        nameList.set(positionTwo, temp);
     }
 }

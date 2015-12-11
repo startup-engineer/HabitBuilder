@@ -4,25 +4,36 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.nhaarman.listviewanimations.appearance.simple.AlphaInAnimationAdapter;
+import com.nhaarman.listviewanimations.appearance.simple.ScaleInAnimationAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
+import com.nhaarman.listviewanimations.itemmanipulation.dragdrop.TouchViewDraggableManager;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismissAdapter;
 import com.software.shell.fab.ActionButton;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnDismissCallback{
     final ArrayList<HabitItem> habitList = new ArrayList<HabitItem>();
 
     @Override
@@ -30,10 +41,62 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ListView lv;
+        final DynamicListView lv;
         final HabitAdapter hAdapter;
 
-        lv = (ListView) findViewById(R.id.listview_forecast);
+        lv = (DynamicListView) findViewById(R.id.listview_forecast);
+
+        final Activity activity = this;
+        hAdapter = new HabitAdapter(habitList, this);
+        AlphaInAnimationAdapter animationAdapter = new AlphaInAnimationAdapter(hAdapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                HabitItem item = (HabitItem) habitList.get(position);
+                if (item.getChildren().size() == 0) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "First item in " + item.getName() + " is null", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                Intent intent = new Intent(activity, subActivity.class)
+                        .putExtra("selectedItem", item);
+                intent.putExtra("selectedPosition", position);
+                startActivityForResult(intent, 2);
+            }
+        });
+
+        lv.enableDragAndDrop();
+        lv.setDraggableManager(new TouchViewDraggableManager(R.id.list_item));
+        lv.setOnItemLongClickListener(
+                new DynamicListView.OnItemLongClickListener() {
+
+                    @Override
+                    public boolean onItemLongClick(final AdapterView<?> parent, final View view,
+                                                   final int position, final long id) {
+                        lv.startDragging(position);
+                        return true;
+                    }
+                }
+        );
+
+        lv.enableSwipeToDismiss(
+                new OnDismissCallback() {
+                    @Override
+                    public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
+                        for (int position : reverseSortedPositions) {
+                            habitList.remove(position);
+                            hAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+        );
+        animationAdapter.setAbsListView(lv);
+
+        assert animationAdapter.getViewAnimator() != null;
+        animationAdapter.getViewAnimator().setInitialDelayMillis(100);
+
+        lv.setAdapter(animationAdapter);
 
         habitList.add(new HabitItem("Guitar"));
         habitList.add(new HabitItem("Read"));
@@ -49,48 +112,6 @@ public class MainActivity extends AppCompatActivity {
         habitList.get(0).getChildren().get(0).addChild(new HabitItem("3"));
         habitList.get(0).getChildren().get(0).addChild(new HabitItem("4"));
 
-        final Activity activity = this;
-        hAdapter = new HabitAdapter(habitList, this);
-
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-              @Override
-              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                  HabitItem item = (HabitItem) habitList.get(position);
-                  if (item.getChildren().size() == 0) {
-                      Toast toast = Toast.makeText(getApplicationContext(), "First item in " + item.getName() + " is null", Toast.LENGTH_SHORT);
-                      toast.show();
-                  }
-                  Intent intent = new Intent(activity, subActivity.class)
-                          .putExtra("selectedItem", item);
-                  intent.putExtra("selectedPosition", position);
-                  startActivityForResult(intent, 2);
-              }
-        });
-        lv.setLongClickable(true);
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                                           int position, long id) {
-                AlertDialog.Builder adb=new AlertDialog.Builder(activity);
-                adb.setTitle("Delete?");
-                adb.setMessage("Are you sure you want to delete " + habitList.get(position).getName());
-                final int positionToRemove = position;
-                adb.setNegativeButton("Cancel", null);
-                adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        habitList.remove(positionToRemove);
-                        hAdapter.notifyDataSetChanged();
-                    }});
-                adb.show();
-                return true;
-            }
-
-
-        });
-
-        lv.setAdapter(hAdapter);
-
         final ActionButton actionButton = (ActionButton) findViewById(R.id.action_button);
         actionButton.setImageResource(R.drawable.fab_plus_icon);
         actionButton.setRippleEffectEnabled(true);
@@ -99,9 +120,20 @@ public class MainActivity extends AppCompatActivity {
 
         actionButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                actionButton.playHideAnimation();
-                Intent i = new Intent(activity, UserInput.class);
-                startActivityForResult(i, 1);
+                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                adb.setTitle("Add Item");
+                adb.setMessage("What item would you like to add?");
+                final EditText input = new EditText(activity);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                adb.setView(input);
+                adb.setNegativeButton("Cancel", null);
+                adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        habitList.add(new HabitItem(input.getText().toString()));
+                        hAdapter.notifyDataSetChanged();
+                    }
+                });
+                adb.show();
             }
         });
     }
@@ -115,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
                 habitList.add(new HabitItem(result));
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
             }
         }
         if(requestCode == 2){
@@ -127,8 +158,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public void onDismiss(@NonNull ViewGroup listView, @NonNull int[] reverseSortedPositions) {
+        for (int position : reverseSortedPositions) {
+            habitList.remove(position);
+        }
     }
 }

@@ -9,10 +9,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -86,9 +88,20 @@ public class subActivity extends AppCompatActivity {
 
         actionButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                actionButton.playHideAnimation();
-                Intent i = new Intent(activity, UserInput.class);
-                startActivityForResult(i, 1);
+                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                adb.setTitle("Add Item");
+                adb.setMessage("What item would you like to add?");
+                final EditText input = new EditText(activity);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                adb.setView(input);
+                adb.setNegativeButton("Cancel", null);
+                adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        habitList.add(new HabitItem(input.getText().toString()));
+                        hAdapter.notifyDataSetChanged();
+                    }
+                });
+                adb.show();
             }
         });
 
