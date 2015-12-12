@@ -52,17 +52,39 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
                 HabitItem item = (HabitItem) habitList.get(position);
-                if (item.getChildren().size() == 0) {
-                    Toast toast = Toast.makeText(getApplicationContext(), "First item in " + item.getName() + " is null", Toast.LENGTH_SHORT);
-                    toast.show();
+                if(!item.children.isEmpty()){
+                    Intent intent = new Intent(activity, subActivity.class)
+                            .putExtra("selectedItem", item);
+                    intent.putExtra("selectedPosition", position);
+                    startActivityForResult(intent, 2);
+                } else {
+                    AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                    adb.setTitle("Create Sublist");
+                    adb.setMessage("Would you like to create a sublist for " + item.getName() + "?");
+                    adb.setNegativeButton("Cancel", null);
+                    adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            AlertDialog.Builder adb2 = new AlertDialog.Builder(activity);
+                            adb2.setTitle("Add Sublist Item");
+                            adb2.setMessage("What item would you like to add?");
+                            final EditText input = new EditText(activity);
+                            input.setInputType(InputType.TYPE_CLASS_TEXT);
+                            adb2.setView(input);
+                            adb2.setNegativeButton("Cancel", null);
+                            adb2.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    habitList.get(position).addChild(new HabitItem(input.getText().toString()));
+                                    hAdapter.notifyDataSetChanged();
+                                }
+                            });
+                            adb2.show();
+                        }
+                    });
+                    adb.show();
                 }
-                Intent intent = new Intent(activity, subActivity.class)
-                        .putExtra("selectedItem", item);
-                intent.putExtra("selectedPosition", position);
-                startActivityForResult(intent, 2);
             }
         });
 
@@ -140,15 +162,6 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-                String result=data.getStringExtra("result");
-                habitList.add(new HabitItem(result));
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-            }
-        }
         if(requestCode == 2){
             HabitItem result = data.getParcelableExtra("result");
             int position = data.getIntExtra("position", -1);
@@ -156,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
             habitList.get(position).setChildren(result.getChildren());
         }
     }
+
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);

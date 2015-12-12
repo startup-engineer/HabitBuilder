@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -13,11 +14,15 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
+import com.nhaarman.listviewanimations.itemmanipulation.dragdrop.TouchViewDraggableManager;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
 import com.software.shell.fab.ActionButton;
 
 import java.util.ArrayList;
@@ -39,7 +44,7 @@ public class subActivity extends AppCompatActivity {
         item = (HabitItem) i.getParcelableExtra("selectedItem");
         parentPositionSelected = i.getIntExtra("selectedPosition", -1);
 
-        ListView lv = (ListView) findViewById(R.id.sub_listview);
+        final DynamicListView lv = (DynamicListView) findViewById(R.id.sub_listview);
         List<HabitItem> habitListTemp = item.getChildren();
         for(int j = 0; j < habitListTemp.size(); j++)
             habitList.add(habitListTemp.get(j));
@@ -47,37 +52,68 @@ public class subActivity extends AppCompatActivity {
         final HabitAdapter hAdapter = new HabitAdapter(habitList, this);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-              @Override
-              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                  HabitItem item = (HabitItem) habitList.get(position);
-                  Intent intent = new Intent(activity, subActivity.class)
-                          .putExtra("selectedItem", item);
-                  intent.putExtra("selectedPosition", position);
-                  startActivityForResult(intent, 2);
-              }
-        });
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                                           int position, long id) {
-                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
-                adb.setTitle("Delete?");
-                adb.setMessage("Are you sure you want to delete " + habitList.get(position).getName());
-                final int positionToRemove = position;
-                adb.setNegativeButton("Cancel", null);
-                adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        habitList.remove(positionToRemove);
-                        hAdapter.notifyDataSetChanged();
-                    }
-                });
-                adb.show();
-                return true;
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                HabitItem item = (HabitItem) habitList.get(position);
+                if(!item.children.isEmpty()){
+                    Intent intent = new Intent(activity, subActivity.class)
+                            .putExtra("selectedItem", item);
+                    intent.putExtra("selectedPosition", position);
+                    startActivityForResult(intent, 2);
+                } else {
+                    AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                    adb.setTitle("Create Sublist");
+                    adb.setMessage("Would you like to create a sublist for " + item.getName() + "?");
+                    adb.setNegativeButton("Cancel", null);
+                    adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            AlertDialog.Builder adb2 = new AlertDialog.Builder(activity);
+                            adb2.setTitle("Add Sublist Item");
+                            adb2.setMessage("What item would you like to add?");
+                            final EditText input = new EditText(activity);
+                            input.setInputType(InputType.TYPE_CLASS_TEXT);
+                            adb2.setView(input);
+                            adb2.setNegativeButton("Cancel", null);
+                            adb2.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    habitList.get(position).addChild(new HabitItem(input.getText().toString()));
+                                    hAdapter.notifyDataSetChanged();
+                                }
+                            });
+                            adb2.show();
+                        }
+                    });
+                    adb.show();
+                }
             }
-
-
         });
+
+        lv.enableDragAndDrop();
+        lv.setDraggableManager(new TouchViewDraggableManager(R.id.list_item));
+        lv.setOnItemLongClickListener(
+                new DynamicListView.OnItemLongClickListener() {
+
+                    @Override
+                    public boolean onItemLongClick(final AdapterView<?> parent, final View view,
+                                                   final int position, final long id) {
+                        lv.startDragging(position);
+                        return true;
+                    }
+                }
+        );
+        lv.enableSwipeToDismiss(
+                new OnDismissCallback() {
+                    @Override
+                    public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
+                        for (int position : reverseSortedPositions) {
+                            habitList.remove(position);
+                            hAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+        );
+
         lv.setAdapter(hAdapter);
 
         final ActionButton actionButton = (ActionButton) findViewById(R.id.sub_action_button);
@@ -136,16 +172,6 @@ public class subActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-                String result=data.getStringExtra("result");
-                habitList.add(new HabitItem(result));
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-            }
-        }
         if(requestCode == 2){
             HabitItem result = data.getParcelableExtra("result");
             int position = data.getIntExtra("position", -1);

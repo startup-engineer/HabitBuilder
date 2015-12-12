@@ -69,7 +69,7 @@
 
     </LinearLayout>
 
-    <ListView
+    <com.nhaarman.listviewanimations.itemmanipulation.DynamicListView
         android:id="@+id/sub_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
