@@ -1,0 +1,27 @@
+Everyone attended the meetings
+
+11/24/15 - First meeting, worked on Android tutorials and discussed possible features for the program. We have also made some decisions such as create
+	 - an object called listView to display
+
+12/02 - We have checkboxes and are working out a way to display a list of habitItems
+
+12/04 - We have decided to use a listview, though this is becoming tricky when trying to display objects rather than strings.
+
+12/05 - We have met again, but we still are struggling to get a ListView to work. We spend most the day just trying to find a set of code that works.
+
+12/06 - We have successfully implemented a listview. Somewhere between all these meetings we decided that the best option for the rest of our time should
+        be to add the ability to traverse the HabitItems.
+
+12/07 - Implementing several items turns out to be fairly manageable. Cameron suggests that saving files could be extremely difficult with a tree structure.
+	Cameron goes into the back to churn out a save file format.
+
+12/08 - A save file algorithm is established (though not implemented). Reet has improved the page traversal. While we are able to traverse, we can't do 
+        basic things such as add, delete, or save checkbox states after a traversal.
+
+12/09 - Our program now saves state after traversing, though it still cannot add or save. Cameron is writing the save algorithm in pure Java to test before
+        implementing in the final program.
+12/10 - No meeting
+12/11 - We finish add, delete. We also add the ability to drag habits across. The saving algorithm is complete, but implementing it in the program turned out
+      - to be harder than expected. Saving is not included in the final project. Though the algorithm would work with some small modification.
+      
+
