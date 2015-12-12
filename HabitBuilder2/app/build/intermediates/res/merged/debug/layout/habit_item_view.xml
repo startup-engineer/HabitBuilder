@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text=""/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true">
+
+        <CheckBox
+            android:layout_width="32dp"
+            android:layout_height="32dp" />
+
+        <CheckBox
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            />
+
+        <CheckBox
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            />
+
+        <CheckBox
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            />
+
+        <CheckBox
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            />
+
+        <CheckBox
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            />
+
+        <CheckBox
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            />
+    </LinearLayout>
+</RelativeLayout>
+<!-- From: file:/E:/BU/EC327/HabitBuilder2/app/src/main/res/layout/habit_item_view.xml -->
