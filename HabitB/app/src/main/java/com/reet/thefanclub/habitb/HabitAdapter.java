@@ -1,100 +1,109 @@
 package com.reet.thefanclub.habitb;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import org.w3c.dom.Text;
+import com.nhaarman.listviewanimations.util.Swappable;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Reet Chowdhary on 12/5/2015.
  */
 
-class HabitItem {
-    String name;
-    boolean completed[] = new boolean[7];
+public class HabitAdapter extends ArrayAdapter<HabitItem> implements Swappable{
 
-    public String getName(){
-        return name;
-    }
-    public boolean[] getCompleted(){
-        return completed;
-    }
-
-    public boolean isChecked(int index){
-        return completed[index];
-    }
-
-    public HabitItem(String name) {
-        super();
-        this.name = name;
-        for(int i = 0; i < 7; i++){
-            completed[i] = false;
-        }
-    }
-}
-
-public class HabitAdapter extends ArrayAdapter<HabitItem> {
-
-    private List<String> nameList;
+    private List<HabitItem> nameList;
     private Context context;
 
-    public HabitAdapter(List<String> nameList, Context context) {
-        super(context, R.layout.list_item_forecast);
+    public HabitAdapter(List<HabitItem> nameList, Context context) {
+        super(context, R.layout.habit_item, nameList);
         this.nameList = nameList;
         this.context = context;
     }
 
-    private static class HabitHolder {
-        public TextView name;
-        public CheckBox completed[] = new CheckBox[7];
+    @Override
+    public long getItemId(final int position) {
+        return getItem(position).hashCode();
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent){
-        View v = convertView;
+    public boolean hasStableIds(){
+        return true;
+    }
 
-        HabitHolder holder = new HabitHolder();
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        if(convertView == null) {
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+            convertView = inflater.inflate(R.layout.habit_item, parent, false);
+        }
+        TextView name = (TextView) convertView.findViewById(R.id.list_item_forecast_textview);
+        CheckBox cb0 = (CheckBox) convertView.findViewById(R.id.box0);
+        CheckBox cb1 = (CheckBox) convertView.findViewById(R.id.box1);
+        CheckBox cb2 = (CheckBox) convertView.findViewById(R.id.box2);
+        CheckBox cb3 = (CheckBox) convertView.findViewById(R.id.box3);
+        CheckBox cb4 = (CheckBox) convertView.findViewById(R.id.box4);
+        CheckBox cb5 = (CheckBox) convertView.findViewById(R.id.box5);
+        CheckBox cb6 = (CheckBox) convertView.findViewById(R.id.box6);
 
-        if(convertView == null){
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(R.layout.list_item_forecast, null);
+        CheckBox checkBoxes[] = {cb0, cb1, cb2, cb3, cb4, cb5, cb6};
 
-            holder.name = (TextView) v.findViewById(R.id.list_item_forecast_textview);
-            holder.completed[0] = (CheckBox) v.findViewById(R.id.box0);
-            holder.completed[1] = (CheckBox) v.findViewById(R.id.box1);
-            holder.completed[2] = (CheckBox) v.findViewById(R.id.box2);
-            holder.completed[3] = (CheckBox) v.findViewById(R.id.box3);
-            holder.completed[4] = (CheckBox) v.findViewById(R.id.box4);
-            holder.completed[5] = (CheckBox) v.findViewById(R.id.box5);
-            holder.completed[6] = (CheckBox) v.findViewById(R.id.box6);
-        } else {
-            holder = (HabitHolder) v.getTag();
+        name.setText(nameList.get(position).getName());
+        cb0.setChecked(nameList.get(position).isChecked(0));
+        cb1.setChecked(nameList.get(position).isChecked(1));
+        cb2.setChecked(nameList.get(position).isChecked(2));
+        cb3.setChecked(nameList.get(position).isChecked(3));
+        cb4.setChecked(nameList.get(position).isChecked(4));
+        cb5.setChecked(nameList.get(position).isChecked(5));
+        cb6.setChecked(nameList.get(position).isChecked(6));
+
+        final int boxId[] = {R.id.box0, R.id.box1, R.id.box2, R.id.box3,
+                R.id.box4, R.id.box5, R.id.box6};
+
+        for (int i = 0; i < 7; i++) {
+            final int finalI = i;
+            checkBoxes[i].setOnClickListener(new View.OnClickListener() {
+
+                public void onClick(View v) {
+
+                    CheckBox cb = (CheckBox) v.findViewById(boxId[finalI]);
+
+                    if (cb.isChecked()) {
+                        nameList.get(position).setCompleted(finalI, true);
+                        Toast toast = Toast.makeText(context, "You clicked " +
+                                nameList.get(position).getName(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else if (!cb.isChecked()) {
+                        nameList.get(position).setCompleted(finalI, false);
+
+                    }
+                }
+            });
+            checkBoxes[i].setChecked(nameList.get(position).isChecked(i));
         }
 
-        HabitItem h = new HabitItem(nameList.get(position));
-        holder.name.setText(h.getName());
-        holder.completed[0].setChecked(h.isChecked(0));
-        holder.completed[1].setChecked(h.isChecked(1));
-        holder.completed[2].setChecked(h.isChecked(2));
-        holder.completed[3].setChecked(h.isChecked(3));
-        holder.completed[4].setChecked(h.isChecked(4));
-        holder.completed[5].setChecked(h.isChecked(5));
-        holder.completed[6].setChecked(h.isChecked(6));
-        holder.completed[0].setTag(h);
-        holder.completed[1].setTag(h);
-        holder.completed[2].setTag(h);
-        holder.completed[3].setTag(h);
-        holder.completed[4].setTag(h);
-        holder.completed[5].setTag(h);
-        holder.completed[6].setTag(h);
+        return convertView;
+    }
 
-        return v;
+    @Override
+    public void swapItems(int positionOne, int positionTwo) {
+        HabitItem temp = nameList.get(positionOne);
+        nameList.set(positionOne, nameList.get(positionTwo));
+        nameList.set(positionTwo, temp);
     }
 }

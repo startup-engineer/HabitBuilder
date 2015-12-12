@@ -1,7 +1,6 @@
 package com.reet.thefanclub.habitb;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,54 +11,47 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.nhaarman.listviewanimations.appearance.simple.AlphaInAnimationAdapter;
-import com.nhaarman.listviewanimations.appearance.simple.ScaleInAnimationAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 import com.nhaarman.listviewanimations.itemmanipulation.dragdrop.TouchViewDraggableManager;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
-import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismissAdapter;
 import com.software.shell.fab.ActionButton;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnDismissCallback{
-    final ArrayList<HabitItem> habitList = new ArrayList<HabitItem>();
-    HabitItem head = new HabitItem("head");
+public class subActivity extends AppCompatActivity {
+    final List<HabitItem> habitList = new ArrayList<HabitItem>();
+    HabitItem item;
+    int parentPositionSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_sub);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        head.addChildren(habitList);
+        Intent i  = getIntent();
+        item = (HabitItem) i.getParcelableExtra("selectedItem");
+        parentPositionSelected = i.getIntExtra("selectedPosition", -1);
 
-        final DynamicListView lv;
-        final HabitAdapter hAdapter;
-
-        lv = (DynamicListView) findViewById(R.id.listview_forecast);
-
+        final DynamicListView lv = (DynamicListView) findViewById(R.id.sub_listview);
+        List<HabitItem> habitListTemp = item.getChildren();
+        for(int j = 0; j < habitListTemp.size(); j++)
+            habitList.add(habitListTemp.get(j));
         final Activity activity = this;
-        hAdapter = new HabitAdapter(habitList, this);
-        AlphaInAnimationAdapter animationAdapter = new AlphaInAnimationAdapter(hAdapter);
+        final HabitAdapter hAdapter = new HabitAdapter(habitList, this);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -112,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
                     }
                 }
         );
-
         lv.enableSwipeToDismiss(
                 new OnDismissCallback() {
                     @Override
@@ -124,28 +115,10 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
                     }
                 }
         );
-        animationAdapter.setAbsListView(lv);
 
-        assert animationAdapter.getViewAnimator() != null;
-        animationAdapter.getViewAnimator().setInitialDelayMillis(100);
+        lv.setAdapter(hAdapter);
 
-        lv.setAdapter(animationAdapter);
-
-        habitList.add(new HabitItem("Guitar"));
-        habitList.add(new HabitItem("Read"));
-        habitList.add(new HabitItem("Exercise"));
-        habitList.add(new HabitItem("Homework"));
-
-        habitList.get(0).addChild(new HabitItem("Scales"));
-        habitList.get(0).addChild(new HabitItem("Chords"));
-        habitList.get(0).addChild(new HabitItem("Stretch"));
-
-        habitList.get(0).getChildren().get(0).addChild(new HabitItem("1A"));
-        habitList.get(0).getChildren().get(0).addChild(new HabitItem("2"));
-        habitList.get(0).getChildren().get(0).addChild(new HabitItem("3"));
-        habitList.get(0).getChildren().get(0).addChild(new HabitItem("4"));
-
-        final ActionButton actionButton = (ActionButton) findViewById(R.id.action_button);
+        final ActionButton actionButton = (ActionButton) findViewById(R.id.sub_action_button);
         actionButton.setImageResource(R.drawable.fab_plus_icon);
         actionButton.setRippleEffectEnabled(true);
         actionButton.setButtonColorRipple(getResources().getColor(R.color.fab_material_blue_500));
@@ -153,22 +126,50 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
 
         actionButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            AlertDialog.Builder adb = new AlertDialog.Builder(activity);
-            adb.setTitle("Add Item");
-            adb.setMessage("What item would you like to add?");
-            final EditText input = new EditText(activity);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            adb.setView(input);
-            adb.setNegativeButton("Cancel", null);
-            adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    habitList.add(new HabitItem(input.getText().toString()));
-                    hAdapter.notifyDataSetChanged();
-                }
-            });
-            adb.show();
+                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                adb.setTitle("Add Item");
+                adb.setMessage("What item would you like to add?");
+                final EditText input = new EditText(activity);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                adb.setView(input);
+                adb.setNegativeButton("Cancel", null);
+                adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        habitList.add(new HabitItem(input.getText().toString()));
+                        hAdapter.notifyDataSetChanged();
+                    }
+                });
+                adb.show();
             }
         });
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            Log.d("CDA", "onKeyDown Called");
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        Log.d("CDA", "onBackPressed Called");
+
+        item.setChildren(habitList);
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("result", (Parcelable) item);
+        returnIntent.putExtra("position", parentPositionSelected);
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
     }
 
     @Override
@@ -181,42 +182,4 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
         }
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putParcelable("head", head);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        HabitItem recovery = (HabitItem) savedInstanceState.getParcelable("head");
-        habitList.clear();
-
-        for(HabitItem item : recovery.getChildren())
-            habitList.add(item);
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-        @Override
-    protected void onResume() {
-        super.onResume();
-        }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onDismiss(@NonNull ViewGroup listView, @NonNull int[] reverseSortedPositions) {
-        for (int position : reverseSortedPositions) {
-            habitList.remove(position);
-        }
-    }
 }

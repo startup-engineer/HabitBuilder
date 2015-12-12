@@ -18,6 +18,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".subActivity"
+            android:label="@string/title_activity_sub"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.reet.thefanclub.habitb.MainActivity" />
+        </activity>
+        <activity
+            android:name=".UserInput"
+            android:label="@string/title_activity_user_input"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
     </application>
-
 </manifest>
