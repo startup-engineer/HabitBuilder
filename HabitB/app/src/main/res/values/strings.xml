@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">HabitBuilder</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_sub"></string>
-    <string name="title_activity_user_input">UserInput</string>
-</resources>
