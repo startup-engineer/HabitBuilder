@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -58,7 +60,7 @@ public class subActivity extends AppCompatActivity {
                 HabitItem item = (HabitItem) habitList.get(position);
                 if(!item.children.isEmpty()){
                     Intent intent = new Intent(activity, subActivity.class)
-                            .putExtra("selectedItem", item);
+                            .putExtra("selectedItem", (Parcelable) item);
                     intent.putExtra("selectedPosition", position);
                     startActivityForResult(intent, 2);
                 } else {
@@ -164,7 +166,7 @@ public class subActivity extends AppCompatActivity {
         item.setChildren(habitList);
 
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("result", item);
+        returnIntent.putExtra("result", (Parcelable) item);
         returnIntent.putExtra("position", parentPositionSelected);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();

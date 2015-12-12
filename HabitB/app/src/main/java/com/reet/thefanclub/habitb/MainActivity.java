@@ -1,9 +1,12 @@
 package com.reet.thefanclub.habitb;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -31,15 +34,23 @@ import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCa
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismissAdapter;
 import com.software.shell.fab.ActionButton;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements OnDismissCallback{
     final ArrayList<HabitItem> habitList = new ArrayList<HabitItem>();
+    HabitItem head = new HabitItem("head");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        head.addChildren(habitList);
 
         final DynamicListView lv;
         final HabitAdapter hAdapter;
@@ -57,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
                 HabitItem item = (HabitItem) habitList.get(position);
                 if(!item.children.isEmpty()){
                     Intent intent = new Intent(activity, subActivity.class)
-                            .putExtra("selectedItem", item);
+                            .putExtra("selectedItem", (Parcelable) item);
                     intent.putExtra("selectedPosition", position);
                     startActivityForResult(intent, 2);
                 } else {
@@ -142,20 +153,20 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
 
         actionButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
-                adb.setTitle("Add Item");
-                adb.setMessage("What item would you like to add?");
-                final EditText input = new EditText(activity);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                adb.setView(input);
-                adb.setNegativeButton("Cancel", null);
-                adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        habitList.add(new HabitItem(input.getText().toString()));
-                        hAdapter.notifyDataSetChanged();
-                    }
-                });
-                adb.show();
+            AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+            adb.setTitle("Add Item");
+            adb.setMessage("What item would you like to add?");
+            final EditText input = new EditText(activity);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            adb.setView(input);
+            adb.setNegativeButton("Cancel", null);
+            adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    habitList.add(new HabitItem(input.getText().toString()));
+                    hAdapter.notifyDataSetChanged();
+                }
+            });
+            adb.show();
             }
         });
     }
@@ -170,10 +181,36 @@ public class MainActivity extends AppCompatActivity implements OnDismissCallback
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable("head", head);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        HabitItem recovery = (HabitItem) savedInstanceState.getParcelable("head");
+        habitList.clear();
+
+        for(HabitItem item : recovery.getChildren())
+            habitList.add(item);
+    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+        @Override
+    protected void onResume() {
+        super.onResume();
+        }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
